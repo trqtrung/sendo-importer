@@ -18,12 +18,11 @@ namespace SendoImporter.Service
         private const string URL_GET_DATA = "https://open.sendo.vn/api/partner/salesorder/search";
         public DateTime From;
         public DateTime To;
-        private Action<SendoApiRefractory> MappingParams;
 
         public SendoApiRefractory(Action<SendoApiRefractory> mappingParams)
         {
             _result = new List<Order>();
-            MappingParams = mappingParams;
+            mappingParams(this);
         }
         public IEnumerable<Order> Result => _result;
 
