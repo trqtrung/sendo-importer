@@ -1,4 +1,5 @@
-﻿using SendoImporter.Data;
+﻿using SendoImporter.ColectionData;
+using SendoImporter.Data;
 using SendoImporter.Repositories;
 using SendoImporter.Service;
 using System;
@@ -12,12 +13,18 @@ namespace SendoImporter
         {
             Console.WriteLine("Sendo Importer - .Net Core Console App with SOLID principles");
 
-            SendoAPI sendoAPI = new SendoAPI();
+            ICollectionCommand<List<Order>> sendoAPI = (ICollectionCommand<List<Order>>) new SendoApiRefractory(a =>
+            {
+                a.From = DateTime.Today.AddDays(-14);
+                a.To = DateTime.Now;
+            });
+            //SendoAPI sendoAPI = new SendoAPI();
             string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTdG9yZUlkIjoiMzgyMDA5IiwiVXNlck5hbWUiOiIiLCJTdG9yZVN0YXR1cyI6IjIiLCJTaG9wVHlwZSI6IjAiLCJTdG9yZUxldmVsIjoiMCIsImV4cCI6MTU5NjY0OTk4MSwiaXNzIjoiMzgyMDA5IiwiYXVkIjoiMzgyMDA5In0.Bd1AqHjcLlYTXFkInlHbTY2vP_XTmQ40pQ_agk-1hjQ"; //await sendoAPI.GetToken();
 
             if (!string.IsNullOrEmpty(token))
             {
-                IList<Order> orders = await sendoAPI.GetOrders(token, DateTime.Today.AddDays(-14), DateTime.Now);
+                await sendoAPI.Execute();
+                IList<Order> orders = sendoAPI.Result;
 
                 if (orders.Count > 0)
                 {
