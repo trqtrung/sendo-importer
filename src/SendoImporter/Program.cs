@@ -13,7 +13,8 @@ namespace SendoImporter
         {
             Console.WriteLine("Sendo Importer - .Net Core Console App with SOLID principles");
 
-            ICollectionCommand<List<Order>> sendoAPI = (ICollectionCommand<List<Order>>) new SendoApiRefractory(a =>
+            CollectionServiceBase<List<Order>> sendoAPI = new SendoApiRefractory<List<Order>>();
+            sendoAPI.MappingParams(a =>
             {
                 a.From = DateTime.Today.AddDays(-14);
                 a.To = DateTime.Now;

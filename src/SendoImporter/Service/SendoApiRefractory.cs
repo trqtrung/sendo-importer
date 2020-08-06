@@ -11,22 +11,17 @@ using System.Threading.Tasks;
 
 namespace SendoImporter.Service
 {
-    public class SendoApiRefractory : ICollectionService<IEnumerable<Order>>, ICollectionCommand<IEnumerable<Order>>
+    public class SendoApiRefractory<TResult> : CollectionServiceBase<TResult>
+        where TResult: class, new()
     {
-        private IEnumerable<Order> _result;
         private const string URL = "https://open.sendo.vn/login";
         private const string URL_GET_DATA = "https://open.sendo.vn/api/partner/salesorder/search";
-        public DateTime From;
-        public DateTime To;
 
-        public SendoApiRefractory(Action<SendoApiRefractory> mappingParams)
+        public SendoApiRefractory():base()
         {
-            _result = new List<Order>();
-            mappingParams(this);
-        }
-        public IEnumerable<Order> Result => _result;
 
-        public async Task<string> GetToken()
+        }
+        public override async Task<string> GetToken()
         {
             
             string shopKey = Config.ShopID;
@@ -54,7 +49,7 @@ namespace SendoImporter.Service
             }
         }
 
-        public async Task<IEnumerable<Order>> Collect(string token, DateTime from, DateTime to)
+        public override async Task<TResult> Collect(string token, DateTime from, DateTime to)
         {
             var json = new { from = from, to = to };
 
@@ -86,20 +81,8 @@ namespace SendoImporter.Service
                 }
             }
 
-            return orders;
+            return (TResult) orders;
         }
-
-        public async Task Execute()
-        {
-            string token = await GetToken();
-            _result = await Collect(token, From, To);
-        }
-
     }
 
-    public class Params
-    {
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-    }
 }
